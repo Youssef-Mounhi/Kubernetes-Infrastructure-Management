@@ -1,0 +1,27 @@
+zhyifan@tx-infra:~/tx-shwet/k8s$ kubectl -n longhorn-system get volumes -w
+NAME                                       DATA ENGINE   STATE      ROBUSTNESS   SCHEDULED   SIZE         NODE   AGE
+pvc-117c303b-d69f-45b8-bd1b-2b63f0490a47   v1            attached   healthy                  2147483648   wk2    3d1h
+pvc-5a5f08b9-4257-45e8-8756-da284e188b8f   v1            attached   healthy                  1073741824   wk2    10m
+pvc-a0c876b1-6fc0-4a5b-b0e4-b0e8b6ff9a3f   v1            attached   healthy                  2147483648   wk2    10m
+pvc-a1528ba7-ff12-4ee7-86c6-d87f09f1d893   v1            attached   healthy                  2147483648   wk2    2d1h
+pvc-5a5f08b9-4257-45e8-8756-da284e188b8f   v1            attached   healthy                  1073741824   wk2    11m
+pvc-a0c876b1-6fc0-4a5b-b0e4-b0e8b6ff9a3f   v1            attached   healthy                  2147483648   wk2    11m
+pvc-a1528ba7-ff12-4ee7-86c6-d87f09f1d893   v1            attached   degraded                 2147483648   wk2    2d1h
+pvc-5a5f08b9-4257-45e8-8756-da284e188b8f   v1            attached   healthy                  1073741824   wk2    11m
+pvc-a0c876b1-6fc0-4a5b-b0e4-b0e8b6ff9a3f   v1            attached   healthy                  2147483648   wk2    11m
+pvc-5a5f08b9-4257-45e8-8756-da284e188b8f   v1            attached   healthy                  1073741824   wk2    11m
+pvc-a0c876b1-6fc0-4a5b-b0e4-b0e8b6ff9a3f   v1            attached   degraded                 2147483648   wk2    11m
+pvc-5a5f08b9-4257-45e8-8756-da284e188b8f   v1            attached   degraded                 1073741824   wk2    11m
+pvc-a0c876b1-6fc0-4a5b-b0e4-b0e8b6ff9a3f   v1            attached   degraded                 2147483648   wk2    11m
+pvc-5a5f08b9-4257-45e8-8756-da284e188b8f   v1            attached   degraded                 1073741824   wk2    11m
+pvc-5a5f08b9-4257-45e8-8756-da284e188b8f   v1            attached   degraded                 1073741824   wk2    12m
+pvc-a0c876b1-6fc0-4a5b-b0e4-b0e8b6ff9a3f   v1            attached   degraded                 2147483648   wk2    12m
+pvc-5a5f08b9-4257-45e8-8756-da284e188b8f   v1            attached   degraded                 1073741824   wk2    12m
+pvc-a0c876b1-6fc0-4a5b-b0e4-b0e8b6ff9a3f   v1            attached   degraded                 2147483648   wk2    12m
+
+zhyifan@tx-infra:~/tx-shwet/k8s$ kubectl -n longhorn-system get volumes -w
+NAME                                       DATA ENGINE   STATE      ROBUSTNESS   SCHEDULED   SIZE         NODE   AGE
+pvc-117c303b-d69f-45b8-bd1b-2b63f0490a47   v1            attached   healthy                  2147483648   wk2    3d1h
+pvc-5a5f08b9-4257-45e8-8756-da284e188b8f   v1            attached   healthy                  1073741824   wk2    61m
+pvc-a0c876b1-6fc0-4a5b-b0e4-b0e8b6ff9a3f   v1            attached   healthy                  2147483648   wk2    61m
+pvc-a1528ba7-ff12-4ee7-86c6-d87f09f1d893   v1            attached   healthy                  2147483648   wk2    2d2h

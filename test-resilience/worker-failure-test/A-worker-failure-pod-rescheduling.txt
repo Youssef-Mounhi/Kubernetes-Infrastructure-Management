@@ -1,0 +1,25 @@
+zhyifan@tx-infra:~/tx-shwet/k8s$ kubectl -n tx-shwet get pod -o wide -w
+NAME                             READY   STATUS      RESTARTS   AGE    IP            NODE   NOMINATED NODE   READINESS GATES
+shwet-8fdfbfdbd-5q4lh            1/1     Running     0          10m    10.42.4.103   wk1    <none>           <none>
+shwet-8fdfbfdbd-8z72q            1/1     Running     0          10m    10.42.5.135   wk2    <none>           <none>
+shwet-scheduler-29452190-sfh9b   0/1     Completed   0          3m3s   10.42.5.137   wk2    <none>           <none>
+shwet-8fdfbfdbd-5q4lh            1/1     Running     0          10m    10.42.4.103   wk1    <none>           <none>
+shwet-8fdfbfdbd-5q4lh            1/1     Terminating   0          10m    10.42.4.103   wk1    <none>           <none>
+shwet-8fdfbfdbd-5q4lh            1/1     Terminating   0          10m    10.42.4.103   wk1    <none>           <none>
+shwet-8fdfbfdbd-b6scr            0/1     Pending       0          1s     <none>        <none>   <none>           <none>
+shwet-8fdfbfdbd-b6scr            0/1     Pending       0          1s     <none>        cp1      <none>           <none>
+shwet-8fdfbfdbd-b6scr            0/1     ContainerCreating   0          1s     <none>        cp1      <none>           <none>
+shwet-8fdfbfdbd-5q4lh            0/1     Completed           0          11m    10.42.4.103   wk1      <none>           <none>
+shwet-8fdfbfdbd-5q4lh            0/1     Completed           0          11m    10.42.4.103   wk1      <none>           <none>
+shwet-8fdfbfdbd-5q4lh            0/1     Completed           0          11m    10.42.4.103   wk1      <none>           <none>
+shwet-8fdfbfdbd-b6scr            0/1     Running             0          55s    10.42.0.34    cp1      <none>           <none>
+shwet-scheduler-29452195-9vspv   0/1     Pending             0          0s     <none>        <none>   <none>           <none>
+shwet-scheduler-29452195-9vspv   0/1     Pending             0          0s     <none>        wk2      <none>           <none>
+shwet-scheduler-29452195-9vspv   0/1     ContainerCreating   0          0s     <none>        wk2      <none>           <none>
+shwet-scheduler-29452195-9vspv   1/1     Running             0          2s     10.42.5.150   wk2      <none>           <none>
+shwet-scheduler-29452195-9vspv   0/1     Completed           0          4s     10.42.5.150   wk2      <none>           <none>
+shwet-scheduler-29452195-9vspv   0/1     Completed           0          5s     10.42.5.150   wk2      <none>           <none>
+shwet-scheduler-29452190-sfh9b   0/1     Completed           0          5m6s   10.42.5.137   wk2      <none>           <none>
+shwet-scheduler-29452190-sfh9b   0/1     Completed           0          5m6s   10.42.5.137   wk2      <none>           <none>
+shwet-scheduler-29452195-9vspv   0/1     Completed           0          6s     10.42.5.150   wk2      <none>           <none>
+shwet-8fdfbfdbd-b6scr            1/1     Running             0          97s    10.42.0.34    cp1      <none>           <none>

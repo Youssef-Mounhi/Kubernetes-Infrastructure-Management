@@ -1,0 +1,14 @@
+{{- if and .Values.phpfpmConfig.enabled .Values.phpfpmConfig.data }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.phpfpmConfig.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "shwet.labels" . | nindent 4 }}
+data:
+{{- range $k, $v := .Values.phpfpmConfig.data }}
+  {{ $k }}: |
+{{ $v | indent 4 }}
+{{- end }}
+{{- end }}

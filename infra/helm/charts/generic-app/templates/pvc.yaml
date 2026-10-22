@@ -1,0 +1,18 @@
+{{- range .Values.pvcs }}
+{{- $appNamespace := $.Values.namespace }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .name }}
+  namespace: {{ .namespace | default $appNamespace }}
+spec:
+  accessModes:
+    {{- range .accessModes | default (list "ReadWriteOnce") }}
+    - {{ . }}
+    {{- end }}
+  storageClassName: {{ .storageClassName | default "longhorn" }}
+  resources:
+    requests:
+      storage: {{ .storage }}
+{{- end }}

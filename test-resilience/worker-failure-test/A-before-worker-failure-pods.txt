@@ -1,0 +1,4 @@
+NAME                             READY   STATUS      RESTARTS   AGE     IP            NODE   NOMINATED NODE   READINESS GATES
+shwet-8fdfbfdbd-5q4lh            1/1     Running     0          6m8s    10.42.4.103   wk1    <none>           <none>
+shwet-8fdfbfdbd-8z72q            1/1     Running     0          6m8s    10.42.5.135   wk2    <none>           <none>
+shwet-scheduler-29452185-js2p8   0/1     Completed   0          3m58s   10.42.5.136   wk2    <none>           <none>

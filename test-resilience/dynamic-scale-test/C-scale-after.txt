@@ -1,0 +1,5 @@
+NAME                             READY   STATUS      RESTARTS   AGE     IP            NODE   NOMINATED NODE   READINESS GATES
+shwet-5557c95767-bsmkg           1/1     Running     0          39m     10.42.5.152   wk2    <none>           <none>
+shwet-5557c95767-djsrz           1/1     Running     0          89s     10.42.0.40    cp1    <none>           <none>
+shwet-5557c95767-vrch2           1/1     Running     0          40m     10.42.4.105   wk1    <none>           <none>
+shwet-scheduler-29452240-2tgrl   0/1     Completed   0          2m54s   10.42.4.115   wk1    <none>           <none>

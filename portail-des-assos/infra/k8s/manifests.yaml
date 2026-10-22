@@ -1,0 +1,274 @@
+---
+# Source: generic-app/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: portail-des-assos
+---
+# Source: generic-app/charts/redis/templates/networkPolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: portail-des-assos-redis-ingress
+  namespace: portail-des-assos
+spec:
+  podSelector:
+    matchLabels:
+      app: redis
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: portail-des-assos
+              app.kubernetes.io/instance: portail-des-assos
+      ports:
+        - protocol: TCP
+          port: 6379
+---
+# Source: generic-app/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: portail-des-assos-secret
+  namespace: portail-des-assos
+type: Opaque
+stringData:
+---
+# Source: generic-app/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: portail-des-assos-config
+  namespace: portail-des-assos
+data:
+  APP_DEBUG: "false"
+  APP_ENV: "production"
+  APP_FAKER_LOCALE: "fr_FR"
+  APP_FALLBACK_LOCALE: "fr"
+  APP_KEY: "base64:Thni7z26i3C6/j8wT3JCLGbvj0jfBdDhSuhFCsW5ZBQ="
+  APP_LOCALE: "fr"
+  APP_MAINTENANCE_DRIVER: "file"
+  APP_NAME: "Portail des Assos"
+  APP_TIMEZONE: "Europe/Paris"
+  APP_URL: "https://pda-tx.assos.utc.fr"
+  BCRYPT_ROUNDS: "12"
+  BROADCAST_CONNECTION: "log"
+  CACHE_PREFIX: ""
+  CACHE_STORE: "file"
+  DB_CONNECTION: "mysql"
+  DB_DATABASE: "new_portail-tx"
+  DB_HOST: "sql.mde.utc"
+  DB_PASSWORD: "oeZ[ROc/(Sl3QCaA"
+  DB_PORT: "3306"
+  DB_USERNAME: "pda-tx"
+  FILESYSTEM_DISK: "local"
+  LOG_CHANNEL: "stack"
+  LOG_DEPRECATIONS_CHANNEL: "null"
+  LOG_LEVEL: "debug"
+  MEMCACHED_HOST: "127.0.0.1"
+  OAUTH_ACCESS_TOKEN_URL: "${OAUTH_URL}/oauth/token"
+  OAUTH_AUTHORIZE_URL: "${OAUTH_URL}/oauth/authorize"
+  OAUTH_CLIENT_ID: "a0a1756c-da09-4248-844d-54546ab00562"
+  OAUTH_CLIENT_SECRET: "2c9ff0291e771b50307b8dda01900914b462e28518a22fe3fd3c2053d6df5908"
+  OAUTH_LOGOUT_URL: "${OAUTH_URL}/logout"
+  OAUTH_REDIRECT_URI: "${APP_URL}/auth/callback"
+  OAUTH_RESOURCE_CURRENT_ASSOCIATIONS_URL: "${OAUTH_URL}/api/user/associations/current"
+  OAUTH_RESOURCE_OWNER_DETAILS_URL: "${OAUTH_URL}/api/user"
+  OAUTH_SCOPES: "users-infos read-memberships read-memberships-history"
+  OAUTH_URL: "https://auth.assos.utc.fr"
+  PHP_CLI_SERVER_WORKERS: "4"
+  QUEUE_CONNECTION: "file"
+  REDIS_CLIENT: "phpredis"
+  REDIS_HOST: "portail-des-assos-redis"
+  REDIS_PASSWORD: "null"
+  REDIS_PORT: "6379"
+  SESSION_DOMAIN: ".utc.fr"
+  SESSION_DRIVER: "file"
+  SESSION_ENCRYPT: "false"
+  SESSION_LIFETIME: "120"
+  SESSION_PATH: "/"
+  UTCOTIZ_KEY: "pas-dispo"
+  UTCOTIZ_URL: "https://cotiser.assos.utc.fr/api/"
+  VITE_APP_NAME: "${APP_NAME}"
+---
+# Source: generic-app/templates/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pda-storage
+  namespace: portail-des-assos
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 2Gi
+---
+# Source: generic-app/charts/redis/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: portail-des-assos-redis
+  namespace: portail-des-assos
+spec:
+  type: ClusterIP
+  selector:
+    app: redis
+  ports:
+    - port: 6379
+      targetPort: 6379
+---
+# Source: generic-app/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: portail-des-assos-service
+  namespace: portail-des-assos
+spec:
+  type: ClusterIP
+  selector:
+    app: portail-des-assos
+  ports:
+    - port: 80
+      name: http
+      targetPort: 8080
+---
+# Source: generic-app/charts/redis/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portail-des-assos-redis
+  namespace: portail-des-assos
+  labels:
+    app: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: "redis:latest"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 6379
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 124Mi
+---
+# Source: generic-app/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portail-des-assos-deployment
+  namespace: portail-des-assos
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: portail-des-assos
+  template:
+    metadata:
+      labels:
+        app: portail-des-assos
+        app.kubernetes.io/name : portail-des-assos
+        app.kubernetes.io/instance : portail-des-assos
+        app.kubernetes.io/component : webapp
+    spec:
+      securityContext:
+        fsGroup: 65534
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+      initContainers:
+        - command:
+          - sh
+          - -c
+          - |
+            # Check if directory is empty (excluding lost+found)
+            if [ -z "$(ls -A /mnt/storage | grep -v '^lost+found$')" ]; then
+              echo "PVC is empty, seeding with default images..."
+              cp -r /var/www/html/storage/app/public/. /mnt/storage/
+              echo "Seeding complete"
+            else
+              echo "PVC contains files:"
+              ls -la /mnt/storage
+              echo "Skipping seed"
+            fi
+          image: youssef129/pda:latest
+          name: seed-storage
+          volumeMounts:
+          - mountPath: /mnt/storage
+            name: pda-volume
+      containers:
+        - name: app
+          image: "youssef129/pda:latest"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: portail-des-assos-config
+            - secretRef:
+                name: portail-des-assos-secret
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 20
+            timeoutSeconds: 5
+            periodSeconds: 20
+            failureThreshold: 3
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+            requests:
+              cpu: 200m
+              memory: 256Mi
+          volumeMounts:
+            - mountPath: /var/www/html/storage/app/public
+              name: pda-volume
+      volumes:
+        - name: pda-volume
+          persistentVolumeClaim:
+            claimName: pda-storage
+---
+# Source: generic-app/templates/ingress.yaml
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: portail-des-assos-route
+  namespace: portail-des-assos
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: >
+        Host("pda-tx.assos.utc.fr")
+      kind: Rule
+      services:
+        - name: portail-des-assos-service
+          port: 80

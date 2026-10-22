@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-deployment" .Release.Name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appName }}
+        app.kubernetes.io/name : {{ .Values.appName }}
+        app.kubernetes.io/instance : {{ .Release.Name }}
+        app.kubernetes.io/component : {{ .Values.labels.component | default "webapp" }}
+    spec:
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
+          ports:
+            - containerPort: {{ .Values.containerPort }}
+          
+          {{- with .Values.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- if or .Values.useConfig .Values.useSecret }}
+          envFrom:
+            {{- if .Values.useConfig }}
+            - configMapRef:
+                name: {{ .Release.Name }}-config
+            {{- end }}
+            {{- if .Values.useSecret }}
+            - secretRef:
+                name: {{ .Release.Name }}-secret
+            {{- end }}
+          {{- end }}
+
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probes.readiness.path | default "/" }}
+              port: {{ .Values.probes.readiness.port | default .Values.containerPort }}
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds | default 10 }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds | default 10 }}
+            timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds | default 5 }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold | default 3 }}
+
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probes.liveness.path | default "/" }}
+              port: {{ .Values.probes.liveness.port | default .Values.containerPort }}
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds | default 20 }}
+            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds | default 5 }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds | default 20 }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold | default 3 }}
+          
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+
+          
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

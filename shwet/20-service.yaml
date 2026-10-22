@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: shwet
+  namespace: tx-shwet
+spec:
+  selector:
+    app: shwet
+  ports:
+    - name: http
+      port: 80          
+      targetPort: 8005  
+  type: ClusterIP

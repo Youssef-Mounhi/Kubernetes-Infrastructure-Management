@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: longhorn-documents-rwx
+  namespace: tx-shwet
+spec:
+  accessModes: ["ReadWriteMany"]
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: longhorn-logs-rwx
+  namespace: tx-shwet
+spec:
+  accessModes: ["ReadWriteMany"]
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi

@@ -1,0 +1,61 @@
+appName: site-vitrine-simde
+namespace: site-vitrine-simde
+
+#######################
+### Deployment
+#######################
+replicaCount: 2
+
+image:
+  repository: youssef129/site-vitrine-simde
+  tag: latest
+  pullPolicy: Always
+
+containerPort: 80
+
+labels:
+  component: webapp
+
+
+podSecurityContext:
+  runAsUser: 0
+  runAsGroup: 0
+  fsGroup: 0
+  runAsNonRoot: false
+
+# Probes to check liveness and readiness of container
+probes:
+  readiness:
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  liveness:
+    initialDelaySeconds: 5
+    periodSeconds: 20
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+#######################
+### Service
+#######################
+service:
+  type: ClusterIP
+  port: 80
+  name: http
+
+#######################
+### Ingress
+#######################
+ingress:
+  host: tx-kube.assos.utc.fr
+  prefix: true
+  pathPrefix: /simde
+  stripPathPrefix: true
+
+
+pvcs: []
+
+volumes: []
+
+volumeMounts: []

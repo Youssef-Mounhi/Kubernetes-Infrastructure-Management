@@ -1,0 +1,7 @@
+zhyifan@tx-infra:~/tx-shwet/k8s$ kubectl get node
+NAME   STATUS   ROLES                       AGE   VERSION
+cp1    Ready    control-plane,etcd,master   79d   v1.33.5+k3s1
+cp2    Ready    control-plane,etcd,master   18d   v1.33.6+k3s1
+cp3    Ready    control-plane,etcd,master   79d   v1.33.5+k3s1
+wk1    Ready    <none>                      79d   v1.33.5+k3s1
+wk2    Ready    <none>                      79d   v1.33.5+k3s1

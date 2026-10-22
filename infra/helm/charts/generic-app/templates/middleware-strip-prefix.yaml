@@ -1,0 +1,11 @@
+{{- if .Values.ingress.stripPathPrefix }}
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ printf "%s-strip-prefix" .Release.Name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  stripPrefix:
+    prefixes:
+      - {{ .Values.ingress.pathPrefix | quote }}
+{{- end }}

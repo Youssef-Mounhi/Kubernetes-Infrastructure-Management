@@ -1,0 +1,7 @@
+apiVersion: v2
+name: shwet
+description: Helm chart for Shwet (Laravel + PHP-FPM) on Kubernetes (Traefik)
+type: application
+
+version: 0.1.0
+appVersion: "latest"

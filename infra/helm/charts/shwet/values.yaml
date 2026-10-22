@@ -1,0 +1,169 @@
+# 是否由 Chart 创建 Namespace（也可以用 helm -n tx-shwet --create-namespace）
+createNamespace: true
+
+namespace: tx-shwet
+
+replicaCount: 2
+
+image:
+  repository: registry.gitlab.utc.fr/simde/shwet
+  tag: latest
+  pullPolicy: Always
+
+containerPort: 8005
+
+podSecurityContext:
+  runAsUser: 0
+  runAsGroup: 0
+
+command: ["sh", "-c", "/var/www/html/laravel-setup.sh"]
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+# envFrom 是否启用
+useConfig: true
+useSecret: true
+
+# ConfigMap（.env 非敏感部分）
+config:
+  APP_NAME: "Shwet"
+  APP_ENV: "production"
+  APP_DEBUG: "false"
+  APP_URL: "https://shwet-tx.assos.utc.fr"
+
+  LOG_CHANNEL: "stack"
+  LOG_LEVEL: "info"
+
+  DB_CONNECTION: "mysql"
+  DB_HOST: "sql.mde.utc"
+  DB_PORT: "3306"
+  DB_DATABASE: "shwet_tx"
+  DB_USERNAME: "shwet-tx"
+  RUN_MIGRATIONS: "false"
+
+  UTCRAWL_API_URL: "https://utcrawl.assos.utc.fr"
+
+  DOCUMENTS_STORAGE_PATH: "public/documents/"
+  OLD_DATA_STORAGE_PATH: "database/seeders/old_data/"
+  USER_ROLES_STORAGE_PATH: "app/data/user_roles.json"
+
+  OAUTH_URL: "https://auth.assos.utc.fr"
+  OAUTH_REDIRECT_URI: "https://shwet-tx.assos.utc.fr/auth/callback"
+  OAUTH_SCOPES: "users-infos read-assos"
+  OAUTH_AUTHORIZATION_URL: "https://auth.assos.utc.fr/oauth/authorize"
+  OAUTH_ACCESS_TOKEN_URL: "https://auth.assos.utc.fr/oauth/token"
+  OAUTH_RESOURCE_OWNER_DETAILS_URL: "https://auth.assos.utc.fr/api/user"
+  OAUTH_RESOURCE_CURRENT_ASSOCIATIONS_URL: "https://auth.assos.utc.fr/api/user/associations/current"
+  OAUTH_LOGOUT_URL: "https://auth.assos.utc.fr/logout"
+
+  BROADCAST_DRIVER: "log"
+  CACHE_DRIVER: "file"
+  FILESYSTEM_DISK: "local"
+  QUEUE_CONNECTION: "sync"
+  SESSION_DRIVER: "file"
+  SESSION_LIFETIME: "120"
+
+  MAIL_MAILER: "smtp"
+  MAIL_HOST: "mail2.mde.utc"
+  MAIL_PORT: "25"
+  MAIL_ENCRYPTION: "null"
+  MAIL_FROM_ADDRESS: "noreply.shwet@assos.utc.fr"
+  MAIL_FROM_NAME: "Shwet"
+  MAIL_SIMDE: "simde@assos.utc.fr"
+
+  VITE_APP_NAME: "Shwet"
+  ASSET_URL: "https://shwet-tx.assos.utc.fr/"
+
+# php-fpm www.conf（文件型 ConfigMap）
+phpfpmConfig:
+  enabled: true
+  name: shwet-phpfpm
+  data:
+    www.conf: |
+      [www]
+      user = nobody
+      group = nobody
+
+      listen = /run/php-fpm.sock
+      listen.owner = nginx
+      listen.group = nginx
+      listen.mode = 0666
+
+      pm = dynamic
+      pm.max_children = 10
+      pm.start_servers = 2
+      pm.min_spare_servers = 1
+      pm.max_spare_servers = 3
+
+      catch_workers_output = yes
+
+# PVC（RWX）
+pvcs:
+  - name: longhorn-documents-rwx
+    storage: 2Gi
+    storageClassName: longhorn
+    accessModes: ["ReadWriteMany"]
+  - name: longhorn-logs-rwx
+    storage: 1Gi
+    storageClassName: longhorn
+    accessModes: ["ReadWriteMany"]
+
+# volumes / mounts（与上面 PVC + phpfpm 对应）
+volumeMounts:
+  - name: phpfpm-www
+    mountPath: /etc/php83/php-fpm.d/www.conf
+    subPath: www.conf
+  - name: documents
+    mountPath: /var/www/html/storage/app/public/documents
+  - name: logs
+    mountPath: /var/www/html/storage/logs
+
+volumes:
+  - name: phpfpm-www
+    configMap:
+      name: shwet-phpfpm
+  - name: documents
+    persistentVolumeClaim:
+      claimName: longhorn-documents-rwx
+  - name: logs
+    persistentVolumeClaim:
+      claimName: longhorn-logs-rwx
+
+service:
+  type: ClusterIP
+  port: 80
+  name: http
+
+ingress:
+  enabled: true
+  className: traefik
+  host: shwet-tx.assos.utc.fr
+  path: /
+
+probes:
+  readiness:
+    initialDelaySeconds: 40
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 6
+  liveness:
+    initialDelaySeconds: 60
+    timeoutSeconds: 5
+    periodSeconds: 20
+    failureThreshold: 6
+
+cronjob:
+  enabled: true
+  name: shwet-scheduler
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  ttlSecondsAfterFinished: 300
+  command: ["sh", "-c", "cd /var/www/html && php artisan schedule:run"]

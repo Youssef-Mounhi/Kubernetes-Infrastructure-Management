@@ -1,0 +1,22 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ printf "%s-route" .Release.Name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: >
+        Host("{{ .Values.ingress.host }}")
+        {{- if .Values.ingress.pathPrefix }}
+        && PathPrefix("{{ .Values.ingress.pathPrefix }}")
+        {{- end }}
+      kind: Rule
+      {{- if .Values.ingress.stripPathPrefix }}
+      middlewares:
+        - name: {{ printf "%s-strip-prefix" .Release.Name }}
+      {{- end }}
+      services:
+        - name: {{ printf "%s-service" .Release.Name }}
+          port: {{ .Values.service.port }}

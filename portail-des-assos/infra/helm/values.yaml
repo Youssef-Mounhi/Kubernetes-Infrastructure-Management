@@ -1,0 +1,117 @@
+appName: portail-des-assos
+namespace: portail-des-assos
+
+#######################
+### Deployment
+#######################
+replicaCount: 2
+
+# Container image for app
+image:
+  repository: youssef129/pda
+  tag: latest
+  pullPolicy: Always
+
+containerPort: 8080
+
+labels:
+  component: webapp
+
+podSecurityContext:
+  # 65534 is the standard ID for the 'nobody' user/group in Alpine
+  runAsUser: 65534
+  runAsGroup: 65534
+  fsGroup: 65534
+  runAsNonRoot: true
+
+# Probes to check liveness and readiness of container
+probes:
+  readiness:
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  liveness:
+    initialDelaySeconds: 20
+    periodSeconds: 20
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+# Resources config for stability purposes
+resources:
+  requests:
+    cpu: "200m"
+    memory: "256Mi"
+  limits:
+    cpu: "1000m"
+    memory: "512Mi"
+
+# If app uses env variables :
+useConfig: true # For configMap : less sensitive data
+useSecret: true # For secretMap : more sensitive data
+
+# Needs to be valid k8s config and synchronized with pvcs
+volumes:
+  - name: pda-volume
+    persistentVolumeClaim:
+      claimName: pda-storage
+
+# Needs to be valid k8s config
+volumeMounts:
+  - name: pda-volume
+    mountPath: /var/www/html/storage/app/public
+
+initContainers:
+  - name: seed-storage
+    image: youssef129/pda:latest
+    command:
+      - sh
+      - -c
+      - |
+        # Check if directory is empty (excluding lost+found)
+        if [ -z "$(ls -A /mnt/storage | grep -v '^lost+found$')" ]; then
+          echo "PVC is empty, seeding with default images..."
+          cp -r /var/www/html/storage/app/public/. /mnt/storage/
+          echo "Seeding complete"
+        else
+          echo "PVC contains files:"
+          ls -la /mnt/storage
+          echo "Skipping seed"
+        fi
+    volumeMounts:
+      - name: pda-volume
+        mountPath: /mnt/storage
+
+
+
+#######################
+### Service
+#######################
+service:
+  type: ClusterIP
+  port: 80
+  name: http
+
+#######################
+### Ingress
+#######################
+ingress:
+  host: pda-tx.assos.utc.fr
+
+
+#######################
+### PVC
+#######################
+pvcs:
+  - name: pda-storage
+    storage: 2Gi
+    namespace: portail-des-assos
+    accessModes: ["ReadWriteMany"]
+
+#######################
+### Redis
+#######################
+redis:
+  enabled: true
+  networkPolicy:
+    allowedAppLabel: portail-des-assos

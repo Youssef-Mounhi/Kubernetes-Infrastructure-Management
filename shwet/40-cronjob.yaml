@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: shwet-scheduler
+  namespace: tx-shwet
+spec:
+  schedule: "*/5 * * * *"   
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 300
+      template:
+        spec:
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+          
+          restartPolicy: Never
+
+          containers:
+            - name: schedule
+              image: registry.gitlab.utc.fr/simde/shwet:latest
+              imagePullPolicy: IfNotPresent
+              command: ["sh", "-c", "cd /var/www/html && php artisan schedule:run"]
+              
+              envFrom:
+                - configMapRef:
+                    name: shwet-env
+                - secretRef:
+                    name: shwet-secret

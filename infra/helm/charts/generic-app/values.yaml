@@ -1,0 +1,112 @@
+appName: app
+namespace: default
+
+#######################
+### Deployment
+#######################
+replicaCount: 1
+
+# Container image for app
+image:
+  repository: crccheck/hello-world
+  tag: latest
+  pullPolicy: Always
+
+containerPort: 8080
+
+labels:
+  component: webapp
+
+podSecurityContext:
+  # 65534 is the standard ID for the 'nobody' user/group in Alpine
+  runAsUser: 65534
+  runAsGroup: 65534
+  fsGroup: 65534
+  runAsNonRoot: true
+
+# Probes to check liveness and readiness of container
+probes:
+  readiness:
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  liveness:
+    initialDelaySeconds: 20
+    periodSeconds: 20
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+# Resources config for stability purposes
+resources:
+  requests:
+    cpu: "200m"
+    memory: "256Mi"
+  limits:
+    cpu: "1000m"
+    memory: "512Mi"
+
+# If app uses env variables :
+useConfig: false # For configMap : less sensitive data
+useSecret: false # For secretMap : more sensitive data
+
+# Needs to be valid k8s config and synchronized with pvcs
+#volumes:
+#  - name: default
+#    persistentVolumeClaim:
+#      claimName: default-storage
+
+# Needs to be valid k8s config
+#volumeMounts:
+#  - name: default
+#    mountPath: /var/www/html/storage
+
+
+#######################
+### Service
+#######################
+service:
+  type: ClusterIP
+  port: 80
+  name: http
+
+#######################
+### Ingress
+#######################
+ingress:
+  host: test.tx.assos.utc.fr
+  # pathPrefix: /
+  # stripPathPrefix : false
+
+
+#######################
+### PVC
+#######################
+#pvcs:
+  #- name: default-storage
+    #storage: 2Gi
+    # namespace: default          # optional, overrides global
+    # storageClassName: longhorn  # optional, defaults to longhorn
+    # accessModes: ["ReadWriteOnce"]  # optional
+
+#######################
+### Cronjob
+#######################
+#cronjob:
+#  enabled: true
+#  name: scheduler
+#  schedule: "*/5 * * * *"
+#  concurrencyPolicy: Forbid
+#  successfulJobsHistoryLimit: 3
+#  failedJobsHistoryLimit: 3
+#  ttlSecondsAfterFinished: 300
+#  command: ["sh", "-c", "./script"]
+
+
+#######################
+### Redis
+#######################
+redis:
+  enabled: false
+#  auth:
+#    password: "super-secret"

@@ -1,0 +1,19 @@
+zhyifan@tx-infra:~/tx-shwet/k8s$ kubectl -n tx-shwet get pod -o wide -w
+NAME                             READY   STATUS      RESTARTS   AGE     IP            NODE   NOMINATED NODE   READINESS GATES
+shwet-5557c95767-bsmkg           1/1     Running     0          36m     10.42.5.152   wk2    <none>           <none>
+shwet-5557c95767-vrch2           1/1     Running     0          37m     10.42.4.105   wk1    <none>           <none>
+shwet-scheduler-29452235-76kmr   0/1     Completed   0          4m58s   10.42.4.114   wk1    <none>           <none>
+shwet-scheduler-29452240-2tgrl   0/1     Pending     0          0s      <none>        <none>   <none>           <none>
+shwet-scheduler-29452240-2tgrl   0/1     Pending     0          0s      <none>        wk1      <none>           <none>
+shwet-scheduler-29452240-2tgrl   0/1     ContainerCreating   0          0s      <none>        wk1      <none>           <none>
+shwet-scheduler-29452240-2tgrl   0/1     Completed           0          1s      10.42.4.115   wk1      <none>           <none>
+shwet-scheduler-29452240-2tgrl   0/1     Completed           0          2s      10.42.4.115   wk1      <none>           <none>
+shwet-scheduler-29452235-76kmr   0/1     Completed           0          5m3s    10.42.4.114   wk1      <none>           <none>
+shwet-scheduler-29452235-76kmr   0/1     Completed           0          5m3s    10.42.4.114   wk1      <none>           <none>
+shwet-scheduler-29452240-2tgrl   0/1     Completed           0          3s      10.42.4.115   wk1      <none>           <none>
+shwet-5557c95767-djsrz           0/1     Pending             0          0s      <none>        <none>   <none>           <none>
+shwet-5557c95767-djsrz           0/1     Pending             0          0s      <none>        cp1      <none>           <none>
+shwet-5557c95767-djsrz           0/1     ContainerCreating   0          0s      <none>        cp1      <none>           <none>
+shwet-5557c95767-djsrz           0/1     Running             0          5s      10.42.0.40    cp1      <none>           <none>
+shwet-5557c95767-djsrz           1/1     Running             0          47s     10.42.0.40    cp1      <none>           <none>
+zhyifan@tx-infra:~/tx-shwet/k8s$ 

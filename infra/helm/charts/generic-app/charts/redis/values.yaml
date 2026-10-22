@@ -1,0 +1,27 @@
+image:
+  repository: redis
+  tag: latest
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+containerPort: 6379
+
+service:
+  port: 6379
+
+auth:
+  enabled: false
+#  password: "change-me"
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "124Mi"
+  limits:
+    cpu: "300m"
+    memory: "256Mi"
+
+networkPolicy:
+  enabled: true
+  allowedAppLabel: app # Needs to be = parent app value

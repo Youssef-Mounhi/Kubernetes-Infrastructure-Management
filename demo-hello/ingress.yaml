@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hello-ing
+  namespace: tx-demo
+spec:
+  ingressClassName: traefik   # k3s 默认的 IngressClass
+  rules:
+  - host: hello.local         # 我们在 hosts 里指向了 VM 的 IP
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hello-svc
+            port:
+              number: 80

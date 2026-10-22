@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shwet-phpfpm
+  namespace: tx-shwet
+data:
+  www.conf: |
+    [www]
+    user = nobody
+    group = nobody
+
+    listen = /run/php-fpm.sock
+    listen.owner = nginx
+    listen.group = nginx
+    listen.mode = 0666
+
+    pm = dynamic
+    pm.max_children = 10
+    pm.start_servers = 2
+    pm.min_spare_servers = 1
+    pm.max_spare_servers = 3
+
+    catch_workers_output = yes
